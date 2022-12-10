@@ -1,0 +1,57 @@
+plugins {
+    id "io.micronaut.build.internal.convention-core-library"
+}
+
+dependencies {
+    annotationProcessor project(":inject-java")
+    annotationProcessor project(":graal")
+    api project(":http")
+    api project(':inject')
+    api project(':aop')
+    api project(':context')
+    api project(":core-reactive")
+    api project(":jackson-databind")
+    api libs.managed.validation
+
+    implementation libs.managed.reactor
+
+    compileOnly libs.managed.graal
+    compileOnly libs.managed.jcache
+
+    compileOnly libs.log4j
+    compileOnly libs.javax.el
+    compileOnly libs.caffeine
+    compileOnly libs.kotlinx.coroutines.core
+    compileOnly libs.kotlinx.coroutines.reactive
+    compileOnly libs.managed.logback
+    testImplementation libs.managed.logback
+
+    testAnnotationProcessor project(":inject-java")
+    testImplementation libs.jsr107
+    testImplementation libs.managed.jcache
+    testImplementation project(":inject-java")
+    testImplementation project(":inject-java-test")
+    testImplementation project(":inject-groovy")
+    if (!JavaVersion.current().isJava9Compatible()) {
+        testImplementation files(org.gradle.internal.jvm.Jvm.current().toolsJar)
+    }
+    testImplementation libs.systemlambda
+}
+
+//compileJava.options.fork = true
+//compileJava.options.forkOptions.jvmArgs = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005']
+
+//compileTestGroovy.groovyOptions.forkOptions.jvmArgs = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005']
+
+spotless {
+    java {
+        targetExclude '**/io/micronaut/scheduling/cron/CronExpression.java'
+    }
+}
+
+tasks.withType(Test) {
+    if(JavaVersion.current().majorVersion.toInteger() >= 17) {
+        logger.warn("Opening java.util, so SystemLambda can work")
+        jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED']
+    }
+}

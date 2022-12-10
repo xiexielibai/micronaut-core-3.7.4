@@ -1,0 +1,22 @@
+plugins {
+    id "io.micronaut.build.internal.convention-core-library"
+    id "org.jetbrains.kotlin.jvm"
+}
+
+micronautBuild {
+    core {
+        documented = false
+    }
+}
+
+dependencies {
+    api project(':inject')
+    api project(':core')
+    compileOnly project(':core-reactive')
+    compileOnly libs.kotlinx.coroutines.core
+}
+
+tasks.named("compileKotlin") {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.languageVersion = "1.6"
+}

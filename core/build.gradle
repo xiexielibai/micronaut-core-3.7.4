@@ -1,0 +1,48 @@
+plugins {
+    id "io.micronaut.build.internal.convention-core-library"
+}
+
+micronautBuild {
+    core {
+        documented = false
+    }
+}
+
+tasks.named("shadowJar") {
+    exclude "module-info.class"
+}
+
+dependencies {
+    compileOnly libs.managed.jsr305
+    compileOnly libs.managed.graal
+    compileOnly libs.kotlin.stdlib
+    compileOnly libs.asm.tree
+
+    shadowCompile libs.bundles.asm
+    shadowCompile libs.asm.tree
+    shadowCompile(libs.caffeine) {
+        exclude group: "com.google.errorprone", module: "error_prone_annotations"
+        exclude group: "org.checkerframework", module: "checker-qual"
+    }
+}
+
+spotless {
+    java {
+        targetExclude '**/io/micronaut/core/io/scan/AnnotationClassReader.java',
+                '**/io/micronaut/core/io/scan/Attribute.java',
+                '**/io/micronaut/core/io/scan/Context.java',
+                '**/io/micronaut/core/util/clhm/**',
+                '**/io/micronaut/core/util/AntPathMatcher.java'
+    }
+    format 'javaMisc', {
+        targetExclude '**/io/micronaut/core/util/clhm/**'
+    }
+}
+
+def versionInfo = tasks.register("micronautVersionInfo", WriteProperties) {
+    outputFile = "${buildDir}/resources/version/micronaut-version.properties"
+    property 'micronaut.version', projectVersion
+}
+tasks.named("processResources") {
+    from(versionInfo)
+}

@@ -1,0 +1,12 @@
+plugins {
+    id "io.micronaut.build.internal.convention-library"
+}
+
+dependencies {
+	annotationProcessor project(":inject-java")
+
+    api project(":runtime")    
+    api project(":http")
+
+    testAnnotationProcessor project(":inject-java")
+}

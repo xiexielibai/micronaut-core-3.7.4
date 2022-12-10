@@ -1,0 +1,41 @@
+plugins {
+    id "io.micronaut.build.internal.convention-core-library"
+}
+
+micronautBuild {
+    core {
+        documented = false
+        usesMicronautTestJunit()
+    }
+
+}
+
+dependencies {
+    api libs.managed.javax.annotation.api
+    compileOnly libs.javax.inject
+    api libs.jakarta.inject.api
+    api libs.managed.jakarta.annotation.api
+    api project(':core')
+    api libs.managed.snakeyaml
+
+    compileOnly libs.javax.persistence
+    compileOnly libs.managed.groovy
+    compileOnly libs.kotlin.stdlib.jdk8
+    compileOnly libs.managed.validation
+
+//    testImplementation libs.managed.validation
+    testImplementation project(":context")
+    testImplementation project(":inject-groovy")
+    testImplementation project(":inject-test-utils")
+    testImplementation libs.systemlambda
+
+    testRuntimeOnly libs.junit.jupiter.engine
+
+}
+
+tasks.withType(Test) {
+    if(JavaVersion.current().majorVersion.toInteger() >= 17) {
+        logger.warn("Opening java.util, so SystemLambda can work")
+        jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED']
+    }
+}
